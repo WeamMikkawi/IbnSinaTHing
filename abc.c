@@ -5,7 +5,7 @@
 #include <time.h>
 
 
-#define initNbLength 2
+#define initNbLength 150
 
 void generateInitNb(char * initNb, int len);
 void keysGeneration();
@@ -32,9 +32,9 @@ Generate Private Public Keys
 void keysGeneration(){
 	//char* initNbChar = malloc(sizeof(char) * (initNbLength+1));
 	char* initNbChar;
-	mpz_init(gcdResult);
-	mpz_init(nn);
-	mpz_init(lambda);
+	//mpz_init(gcdResult);
+	//mpz_init(nn);
+	//mpz_init(lambda);
 	do{
 		 initNbChar = malloc(sizeof(char) * (initNbLength+1));
 		generateInitNb(initNbChar, initNbLength);
@@ -45,32 +45,36 @@ void keysGeneration(){
 		generateInitNb(initNbChar, initNbLength);
 		mpz_set_str(initNbMpz, initNbChar, 10/*decimal*/);
 		mpz_nextprime (q, initNbMpz);
+
+//6666666666666666666666666666666666666
+		//mpz_init_set_str(p,"7",10);
+		//mpz_init_set_str(q,"11",10);
+//6666666666666666666666666666
+
+
+
+
 		mpz_sub_ui(p_1, p, 1);
 		mpz_sub_ui(q_1, q, 1);
 		mpz_mul(n, p, q);
 		mpz_mul(tmpI, p_1, q_1);
 		mpz_gcd(gcdResult, tmpI, n);
-		gmp_printf("next-prime > :%Zd\n",gcdResult);
 		
 	}while(mpz_cmp_ui(gcdResult, 1) != 0); // check if (gcd(pq, (p-1)(q-1)) = 1
 //	mpz_mul(n, p, q);
-		gmp_printf("p > :%Zd\n",p); //$$$$$$$$$$$$$$$$$$$$$
-		gmp_printf("q > :%Zd\n",q); //%^#^@%^@%
 		mpz_mul(nn, n, n);
-		gmp_printf("n > :%Zd\n",n); //%^#^@%^@%
-		gmp_printf("n^2 > :%Zd\n",nn); //%^#^@%^@%
 		mpz_lcm(lambda, p_1, q_1);
-		gmp_printf("lambda > :%Zd\n",lambda); //%^#^@%^@%
 		
 	// generate a number g within the range 0 to n*n-1 inclusive ! 
 	// this way i can get rid of using mod n^2 on this step 
 	gmp_randstate_t state;
 	gmp_randinit_mt (state); // initiallize state with Mersenne Twister which is basically fast one !
 	mpz_urandomm(g, state, nn);
-	gmp_printf("g > :%Zd\n",g); //%^#^@%^@%
-
+//66666666666666666666666666666666
+	//mpz_init_set_str(g,"5652",10);
+//666666666666666666666666666666666666666
 	// Now we check if g is good enough for us 
-	mpz_powm(tmpI, g/*base*/, lambda/*exp*/, nn/*mod*/); // tmp = base^exp modulo mod
+	mpz_powm(tmpI, g/*base*/, lambda/*exp*/, nn/*mod*/); // tmp = base^exp modulo mod 
 	// now L(u) = (u-1)/n
 	mpz_sub_ui(tmpI, tmpI, 1);
 	mpz_tdiv_q(tmpI, tmpI, n);
@@ -80,6 +84,7 @@ void keysGeneration(){
 		printf("G is not proper !!!\n");
 		exit(EXIT_FAILURE);
 	}
+	
 
 
 	printf("Keys Generation Result : \n");
@@ -92,7 +97,7 @@ void keysGeneration(){
 	printf("Micro :3 \n");
 	printf("End --  \n");
 	
-	return;
+	
 }
 /*
 Do the Encryption over the data
@@ -105,9 +110,14 @@ void encrypt(int msg/*To be extended to other types !*/){
 	gmp_randstate_t state;
 	gmp_randinit_mt (state); // initiallize state with Mersenne Twister which is basically fast one !
 	mpz_urandomm(r, state, n);
-
+//66666666666666666666666666666666666
+	//mpz_init_set_str(r,"23",10);
+//6666666666666666666666666666666666	
+	gmp_printf ("\nr = %Zd\n", r);
 	mpz_powm_ui(tmpI, g/*base*/, m/*exp*/, nn/*mod*/); // tmp = base^exp modulo mod
+	gmp_printf ("\ng^m = %Zd\n", tmpI);
 	mpz_powm(tmpII, r/*base*/, n/*exp*/, nn/*mod*/); // tmp = base^exp modulo mod
+	gmp_printf ("\nr^n = %Zd\n", tmpII);
 	// Remember : a.b mod n = ((a mod n).(b mod n)) mod n
 	mpz_mul(c, tmpI, tmpII);
 	mpz_mod(c, c, nn);
@@ -118,12 +128,17 @@ void encrypt(int msg/*To be extended to other types !*/){
 void decryption(){
 	
 	mpz_powm(tmpI, c/*base*/, lambda/*exp*/, nn/*mod*/); // tmp = base^exp modulo mod
+	mpz_sub_ui(tmpI,tmpI,1);
+	mpz_tdiv_q(tmpI, tmpI, n);
 	mpz_powm(tmpII, g/*base*/, lambda/*exp*/, nn/*mod*/); // tmp = base^exp modulo mod
-	mpz_tdiv_q (tmpI, tmpI, tmpII);  
+	mpz_sub_ui(tmpII,tmpII,1);
+	mpz_tdiv_q(tmpII, tmpII, n);
+	mpz_invert (tmpII,tmpII,n);
+	mpz_mul(tmpI,tmpII,tmpI);
 	mpz_mod(tmpI, tmpI, n);
-
 	gmp_printf ("\nDecryption = %Zd\n", tmpI);
 }
+
 /*
 Make the Decryption
 */
@@ -145,6 +160,19 @@ void generateInitNb(char * initNb, int len){
 	//printf("\nFrom Generation = \n%s\n", initNb);
 }
 int main(){
+	mpz_init( p);
+	mpz_init( q);
+	mpz_init( n);
+	mpz_init( lambda);
+	mpz_init( g);
+	mpz_init( nn); // n squared 
+	mpz_init( initNbMpz);
+	mpz_init( gcdResult);
+	mpz_init( lcmResult);
+	mpz_init( tmpI);
+	mpz_init( tmpII);
+	mpz_init( p_1);
+	mpz_init( q_1);
 
 	//[Declaration]//mpz_t  r; // this is how to declare int in gmp
 	//[initiallization]// mpz_init (r); // this is how i initialize the variables 
@@ -177,10 +205,12 @@ int main(){
 	
 	srand((unsigned) time(&t));
 	keysGeneration();
-	return 0;
-	encrypt(6000);
-	decryption();
+	printf("what are you doin  dude!!\n");
 
+	encrypt(6034);
+	//IMPORTANT
+	//I have to make sure that (m; which i want to encrypt) is smaller than n
+	decryption();
 	mpz_clear(p);
 	mpz_clear(q);
 	mpz_clear(n);
