@@ -33,43 +33,42 @@ void keysGeneration(){
 	//char* initNbChar = malloc(sizeof(char) * (initNbLength+1));
 	char* initNbChar;
 	mpz_init(gcdResult);
+	mpz_init(nn);
+	mpz_init(lambda);
 	do{
 		 initNbChar = malloc(sizeof(char) * (initNbLength+1));
 		generateInitNb(initNbChar, initNbLength);
 		mpz_set_str(initNbMpz, initNbChar, 10/*decimal*/);
-		gmp_printf("it is a start :3 :%Zd\n",initNbMpz); //$$$$$$$$$$$$$$$$$
 		mpz_nextprime (p, initNbMpz);
-		gmp_printf("next-prime > :%Zd\n",p); //$$$$$$$$$$$$$$$$$$$$$
-		 initNbChar = malloc(sizeof(char) * (initNbLength+1));
-		 generateInitNb(initNbChar, initNbLength);
-		 mpz_set_str(initNbMpz, initNbChar, 10/*decimal*/);
-		mpz_nextprime (q, initNbMpz);
-		gmp_printf("next-prime-q :%Zd\n",q); //%^#^@%^@%
-
-		mpz_sub_ui(p_1, p, 1);
-		gmp_printf("next-prime > :%Zd\n",p_1);
-		mpz_sub_ui(q_1, q, 1);
-		gmp_printf("next-prime > :%Zd\n",q_1);
-
-		mpz_mul(n, p, q);
-		gmp_printf("next-prime > :%Zd\n",n);
 		
+		initNbChar = malloc(sizeof(char) * (initNbLength+1));
+		generateInitNb(initNbChar, initNbLength);
+		mpz_set_str(initNbMpz, initNbChar, 10/*decimal*/);
+		mpz_nextprime (q, initNbMpz);
+		mpz_sub_ui(p_1, p, 1);
+		mpz_sub_ui(q_1, q, 1);
+		mpz_mul(n, p, q);
 		mpz_mul(tmpI, p_1, q_1);
-		gmp_printf("next-prime > :%Zd\n",tmpI);
 		mpz_gcd(gcdResult, tmpI, n);
 		gmp_printf("next-prime > :%Zd\n",gcdResult);
-		return;
 		
 	}while(mpz_cmp_ui(gcdResult, 1) != 0); // check if (gcd(pq, (p-1)(q-1)) = 1
 //	mpz_mul(n, p, q);
-	mpz_mul(nn, n, n);
-	mpz_lcm(lambda, p_1, q_1);
-
+		gmp_printf("p > :%Zd\n",p); //$$$$$$$$$$$$$$$$$$$$$
+		gmp_printf("q > :%Zd\n",q); //%^#^@%^@%
+		mpz_mul(nn, n, n);
+		gmp_printf("n > :%Zd\n",n); //%^#^@%^@%
+		gmp_printf("n^2 > :%Zd\n",nn); //%^#^@%^@%
+		mpz_lcm(lambda, p_1, q_1);
+		gmp_printf("lambda > :%Zd\n",lambda); //%^#^@%^@%
+		
 	// generate a number g within the range 0 to n*n-1 inclusive ! 
 	// this way i can get rid of using mod n^2 on this step 
 	gmp_randstate_t state;
 	gmp_randinit_mt (state); // initiallize state with Mersenne Twister which is basically fast one !
 	mpz_urandomm(g, state, nn);
+	gmp_printf("g > :%Zd\n",g); //%^#^@%^@%
+
 	// Now we check if g is good enough for us 
 	mpz_powm(tmpI, g/*base*/, lambda/*exp*/, nn/*mod*/); // tmp = base^exp modulo mod
 	// now L(u) = (u-1)/n
@@ -93,7 +92,7 @@ void keysGeneration(){
 	printf("Micro :3 \n");
 	printf("End --  \n");
 	
-	
+	return;
 }
 /*
 Do the Encryption over the data
